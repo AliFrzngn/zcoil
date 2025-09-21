@@ -1,0 +1,167 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - main
+      - 'releases/**'
+  pull_request:
+    branches:
+      - main
+
+env:
+  REGISTRY: ghcr.io
+  IMAGE_NAMESPACE: ${{ github.repository_owner }}/microservices-app
+  PYTHON_VERSION: '3.11'
+  NODE_VERSION: '18'
+
+permissions:
+  contents: read
+  packages: write
+  id-token: write
+
+jobs:
+  lint-test-build:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:15
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: test_db
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres -d test_db"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+      redis:
+        image: redis:7
+        ports:
+          - 6379:6379
+        options: >-
+          --health-cmd "redis-cli ping || exit 1"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    env:
+      DATABASE_URL: postgres://postgres:postgres@localhost:5432/test_db
+      REDIS_URL: redis://localhost:6379
+      CI: 'true'
+
+    strategy:
+      matrix:
+        include:
+          - target: backend
+          - target: frontend
+          - target: docker-build
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        if: matrix.target == 'backend' || matrix.target == 'docker-build'
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+
+      - name: Set up Node
+        if: matrix.target == 'frontend' || matrix.target == 'docker-build'
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      - name: Cache Python pip
+        if: matrix.target == 'backend' || matrix.target == 'docker-build'
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/pip
+          key: pip-cache-${{ runner.os }}-v1-${{ hashFiles('**/requirements.txt') }}
+          restore-keys: |
+            pip-cache-${{ runner.os }}-v1-
+
+      - name: Install backend dependencies
+        if: matrix.target == 'backend' || matrix.target == 'docker-build'
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r backend/requirements.txt
+
+      - name: Install frontend dependencies
+        if: matrix.target == 'frontend' || matrix.target == 'docker-build'
+        run: |
+          cd frontend
+          npm ci
+
+      - name: Backend Lint and Type Check
+        if: matrix.target == 'backend'
+        run: |
+          cd backend
+          # Linting
+          flake8
+          # Formatting check
+          black --check .
+          isort --check-only .
+          # Type checking
+          mypy .
+
+      - name: Backend Tests
+        if: matrix.target == 'backend'
+        run: |
+          cd backend
+          # Apply migrations if your project uses them. Add command if required.
+          pytest --maxfail=1 --disable-warnings -q --cov=backend
+
+      - name: Frontend Lint and Type Check
+        if: matrix.target == 'frontend'
+        run: |
+          cd frontend
+          npm run lint
+          npm run type-check
+
+      - name: Frontend Tests
+        if: matrix.target == 'frontend'
+        run: |
+          cd frontend
+          npm test -- --watchAll=false
+
+      - name: Set up Docker Buildx
+        if: matrix.target == 'docker-build'
+        uses: docker/setup-buildx-action@v3
+
+      - name: Login to GitHub Container Registry
+        if: matrix.target == 'docker-build'
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build Docker images for microservices
+        if: matrix.target == 'docker-build'
+        uses: docker/build-push-action@v4
+        with:
+          context: .
+          push: false
+          platforms: linux/amd64,linux/arm64
+          file: ./docker/Dockerfile   # optional single Dockerfile entry; adjust per your repo
+          tags: |
+            ${{ env.REGISTRY }}/${{ env.IMAGE_NAMESPACE }}/inventory:ci-${{ github.sha }}
+            ${{ env.REGISTRY }}/${{ env.IMAGE_NAMESPACE }}/crm:ci-${{ github.sha }}
+            ${{ env.REGISTRY }}/${{ env.IMAGE_NAMESPACE }}/user:ci-${{ github.sha }}
+            ${{ env.REGISTRY }}/${{ env.IMAGE_NAMESPACE }}/notification:ci-${{ github.sha }}
+          cache-from: type=registry,ref=${{ env.REGISTRY }}/${{ env.IMAGE_NAMESPACE }}/cache:latest
+          cache-to: type=inline
+
+      - name: Upload built image metadata artifact
+        if: matrix.target == 'docker-build'
+        uses: actions/upload-artifact@v4
+        with:
+          name: built-image-tags
+          path: |
+            ./built-image-tags.txt
+        # Note: The build step does not push images. Populate built-image-tags.txt in your build process if needed.
