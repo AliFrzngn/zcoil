@@ -1,35 +1,81 @@
-"""
-Inventory Service - FastAPI application
-"""
+"""Inventory service main application."""
 
-from fastapi import FastAPI
+from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
-import uvicorn
+from contextlib import asynccontextmanager
+import logging
 
+from backend.shared.config import settings
+from backend.shared.database import create_tables
+from .app.api.v1 import api_router
+
+# Configure logging
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
+
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    """Application lifespan events."""
+    # Startup
+    logger.info("Starting Inventory Service...")
+    create_tables()
+    logger.info("Inventory Service started successfully")
+    
+    yield
+    
+    # Shutdown
+    logger.info("Shutting down Inventory Service...")
+
+
+# Create FastAPI application
 app = FastAPI(
-    title="Inventory Service",
-    description="Microservice for managing inventory, products, and categories",
-    version="1.0.0",
-    docs_url="/docs",
-    redoc_url="/redoc"
+    title="AliFrzngn Development - Inventory Service",
+    description="Product and inventory management service",
+    version=settings.service_version,
+    lifespan=lifespan
 )
 
-# CORS middleware
+# Add CORS middleware
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # Configure appropriately for production
+    allow_origins=settings.cors_origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
-@app.get("/")
-async def root():
-    return {"message": "Inventory Service is running"}
+# Include API routes
+app.include_router(api_router)
+
 
 @app.get("/health")
 async def health_check():
-    return {"status": "healthy", "service": "inventory-service"}
+    """Health check endpoint."""
+    return {
+        "status": "healthy",
+        "service": "inventory-service",
+        "version": settings.service_version,
+        "environment": settings.environment
+    }
+
+
+@app.get("/")
+async def root():
+    """Root endpoint."""
+    return {
+        "message": "AliFrzngn Development - Inventory Service",
+        "version": settings.service_version,
+        "docs": "/docs"
+    }
+
 
 if __name__ == "__main__":
-    uvicorn.run(app, host="0.0.0.0", port=8000)
+    import uvicorn
+    uvicorn.run(
+        "main:app",
+        host="0.0.0.0",
+        port=8001,
+        reload=settings.debug,
+        log_level="info"
+    )
