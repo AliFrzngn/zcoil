@@ -1,11 +1,9 @@
-<<<<<<< Current (Your changes)
-# Configuration management
-=======
 """Configuration management for microservices."""
 
 import os
 from typing import Optional
-from pydantic import BaseSettings, Field
+from pydantic import Field
+from pydantic_settings import BaseSettings
 
 
 class Settings(BaseSettings):
@@ -13,7 +11,7 @@ class Settings(BaseSettings):
     
     # Database settings
     database_url: str = Field(
-        default="postgresql://postgres:postgres@localhost:5432/ali_frzngn_dev",
+        default="sqlite:///./inventory.db",
         env="DATABASE_URL"
     )
     
@@ -65,4 +63,3 @@ class Settings(BaseSettings):
 
 # Global settings instance
 settings = Settings()
->>>>>>> Incoming (Background Agent changes)

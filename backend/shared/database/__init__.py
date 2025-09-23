@@ -1,6 +1,3 @@
-<<<<<<< Current (Your changes)
-# Database utilities and models
-=======
 """Database configuration and utilities."""
 
 from sqlalchemy import create_engine, MetaData
@@ -45,4 +42,3 @@ def create_tables():
 def drop_tables():
     """Drop all tables."""
     Base.metadata.drop_all(bind=engine)
->>>>>>> Incoming (Background Agent changes)
