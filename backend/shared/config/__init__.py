@@ -55,8 +55,6 @@ class Settings(BaseSettings):
         env="CRM_SERVICE_URL"
     )
     
-<<<<<<< Current (Your changes)
-=======
     # Email settings
     smtp_server: str = Field(
         default="smtp.gmail.com",
@@ -89,7 +87,6 @@ class Settings(BaseSettings):
         env="FRONTEND_URL"
     )
     
->>>>>>> Incoming (Background Agent changes)
     class Config:
         env_file = ".env"
         case_sensitive = False

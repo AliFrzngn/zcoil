@@ -1,13 +1,13 @@
 'use client';
 
 import { useState } from 'react';
-import { ProductCard } from './ProductCard';
-import { ProductTable } from './ProductTable';
+import { UserCard } from './UserCard';
+import { UserTable } from './UserTable';
 import { Pagination } from '@/components/ui/Pagination';
 import { Button } from '@/components/ui/Button';
 import { ViewColumnsIcon, Squares2X2Icon } from '@heroicons/react/24/outline';
 
-interface ProductListProps {
+interface UserListProps {
   data?: any;
   isLoading: boolean;
   error: any;
@@ -15,7 +15,7 @@ interface ProductListProps {
   onRefresh: () => void;
 }
 
-export function ProductList({ data, isLoading, error, onPageChange, onRefresh }: ProductListProps) {
+export function UserList({ data, isLoading, error, onPageChange, onRefresh }: UserListProps) {
   const [viewMode, setViewMode] = useState<'grid' | 'table'>('table');
 
   if (isLoading) {
@@ -34,8 +34,8 @@ export function ProductList({ data, isLoading, error, onPageChange, onRefresh }:
     return (
       <div className="text-center py-12">
         <div className="text-red-600 text-2xl mb-4">⚠️</div>
-        <h3 className="text-lg font-medium text-gray-900 mb-2">Failed to load products</h3>
-        <p className="text-gray-500 mb-4">There was an error loading the product list.</p>
+        <h3 className="text-lg font-medium text-gray-900 mb-2">Failed to load users</h3>
+        <p className="text-gray-500 mb-4">There was an error loading the user list.</p>
         <Button onClick={onRefresh} className="btn btn-outline">
           Try Again
         </Button>
@@ -43,7 +43,7 @@ export function ProductList({ data, isLoading, error, onPageChange, onRefresh }:
     );
   }
 
-  const products = data?.items || [];
+  const users = data?.items || [];
   const total = data?.total || 0;
   const page = data?.page || 1;
   const pages = data?.pages || 1;
@@ -53,7 +53,7 @@ export function ProductList({ data, isLoading, error, onPageChange, onRefresh }:
       {/* View Controls */}
       <div className="flex justify-between items-center">
         <div className="text-sm text-gray-500">
-          Showing {products.length} of {total} products
+          Showing {users.length} of {total} users
         </div>
         <div className="flex space-x-2">
           <Button
@@ -73,23 +73,23 @@ export function ProductList({ data, isLoading, error, onPageChange, onRefresh }:
         </div>
       </div>
 
-      {/* Products */}
-      {products.length === 0 ? (
+      {/* Users */}
+      {users.length === 0 ? (
         <div className="text-center py-12">
-          <div className="text-gray-400 text-4xl mb-4">📦</div>
-          <h3 className="text-lg font-medium text-gray-900 mb-2">No products found</h3>
-          <p className="text-gray-500">Get started by adding your first product.</p>
+          <div className="text-gray-400 text-4xl mb-4">👥</div>
+          <h3 className="text-lg font-medium text-gray-900 mb-2">No users found</h3>
+          <p className="text-gray-500">No users match your current filters.</p>
         </div>
       ) : (
         <>
           {viewMode === 'table' ? (
-            <ProductTable products={products} onRefresh={onRefresh} />
+            <UserTable users={users} onRefresh={onRefresh} />
           ) : (
             <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
-              {products.map((product: any) => (
-                <ProductCard
-                  key={product.id}
-                  product={product}
+              {users.map((user: any) => (
+                <UserCard
+                  key={user.id}
+                  user={user}
                   onRefresh={onRefresh}
                 />
               ))}

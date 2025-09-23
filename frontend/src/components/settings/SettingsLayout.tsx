@@ -1,32 +1,30 @@
 'use client';
 
-import { ReactNode } from 'react';
+import { ReactNode, useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import {
-  CubeIcon,
-  PlusIcon,
-  ChartBarIcon,
-  ExclamationTriangleIcon,
   ArrowRightOnRectangleIcon,
   Bars3Icon,
   XMarkIcon,
+  HomeIcon,
+  UserIcon,
+  CogIcon,
 } from '@heroicons/react/24/outline';
 import { User } from '@/lib/auth';
 
-interface InventoryLayoutProps {
+interface SettingsLayoutProps {
   children: ReactNode;
   user?: User;
 }
 
-const inventoryNavigation = [
-  { name: 'All Products', href: '/inventory', icon: CubeIcon },
-  { name: 'Add Product', href: '/inventory/create', icon: PlusIcon },
-  { name: 'Low Stock', href: '/inventory/low-stock', icon: ExclamationTriangleIcon },
-  { name: 'Analytics', href: '/inventory/analytics', icon: ChartBarIcon },
+const settingsNavigation = [
+  { name: 'Dashboard', href: '/dashboard', icon: HomeIcon },
+  { name: 'Profile', href: '/settings', icon: UserIcon },
+  { name: 'Preferences', href: '/settings', icon: CogIcon },
 ];
 
-export function InventoryLayout({ children, user }: InventoryLayoutProps) {
+export function SettingsLayout({ children, user }: SettingsLayoutProps) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const router = useRouter();
 
@@ -43,7 +41,7 @@ export function InventoryLayout({ children, user }: InventoryLayoutProps) {
         <div className="fixed inset-0 bg-gray-600 bg-opacity-75" onClick={() => setSidebarOpen(false)} />
         <div className="fixed inset-y-0 left-0 flex w-64 flex-col bg-white">
           <div className="flex h-16 items-center justify-between px-4">
-            <h1 className="text-xl font-semibold text-gray-900">Inventory</h1>
+            <h1 className="text-xl font-semibold text-gray-900">Settings</h1>
             <button
               type="button"
               className="text-gray-400 hover:text-gray-600"
@@ -53,7 +51,7 @@ export function InventoryLayout({ children, user }: InventoryLayoutProps) {
             </button>
           </div>
           <nav className="flex-1 space-y-1 px-2 py-4">
-            {inventoryNavigation.map((item) => (
+            {settingsNavigation.map((item) => (
               <Link
                 key={item.name}
                 href={item.href}
@@ -71,10 +69,10 @@ export function InventoryLayout({ children, user }: InventoryLayoutProps) {
       <div className="hidden lg:fixed lg:inset-y-0 lg:flex lg:w-64 lg:flex-col">
         <div className="flex flex-col flex-grow bg-white border-r border-gray-200">
           <div className="flex h-16 items-center px-4">
-            <h1 className="text-xl font-semibold text-gray-900">Inventory Management</h1>
+            <h1 className="text-xl font-semibold text-gray-900">Settings</h1>
           </div>
           <nav className="flex-1 space-y-1 px-2 py-4">
-            {inventoryNavigation.map((item) => (
+            {settingsNavigation.map((item) => (
               <Link
                 key={item.name}
                 href={item.href}
@@ -123,7 +121,7 @@ export function InventoryLayout({ children, user }: InventoryLayoutProps) {
 
         {/* Page content */}
         <main className="py-6">
-          <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <div className="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8">
             {children}
           </div>
         </main>
