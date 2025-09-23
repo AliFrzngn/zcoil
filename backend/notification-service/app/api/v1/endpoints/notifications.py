@@ -6,14 +6,14 @@ from sqlalchemy.orm import Session
 
 from backend.shared.database import get_db
 from backend.shared.auth import get_current_user
-from ...schemas.notification import (
+from schemas.notification import (
     NotificationCreate, 
     NotificationUpdate, 
     NotificationResponse, 
     NotificationListResponse,
     NotificationFilters
 )
-from ...services.notification_service import NotificationService
+from services.notification_service import NotificationService
 
 router = APIRouter(prefix="/notifications", tags=["notifications"])
 

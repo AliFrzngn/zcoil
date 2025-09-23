@@ -3,8 +3,8 @@
 from typing import List, Optional
 from fastapi import APIRouter, Depends, HTTPException, status, Query
 from backend.shared.auth import get_current_customer
-from ...schemas.customer import CustomerProductResponse, CustomerProductListResponse
-from ...services.customer_service import CustomerService
+from schemas.customer import CustomerProductResponse, CustomerProductListResponse
+from services.customer_service import CustomerService
 
 router = APIRouter(prefix="/customers", tags=["customers"])
 

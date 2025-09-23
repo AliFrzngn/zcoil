@@ -4,7 +4,7 @@ from typing import List, Dict, Any
 from fastapi import HTTPException, status
 from backend.shared.utils import HTTPClient
 from backend.shared.config import settings
-from ..schemas.customer import CustomerProductResponse
+from schemas.customer import CustomerProductResponse
 
 
 class CustomerService:

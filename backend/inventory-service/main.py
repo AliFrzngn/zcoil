@@ -7,7 +7,7 @@ import logging
 
 from backend.shared.config import settings
 from backend.shared.database import create_tables
-from .app.api.v1 import api_router
+from app.api.v1 import api_router
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)

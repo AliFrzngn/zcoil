@@ -5,9 +5,12 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from fastapi.testclient import TestClient
 
+import sys
+import os
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', '..'))
 from backend.shared.database import Base, get_db
-from backend.inventory_service.main import app
-from backend.inventory_service.models.product import Product
+from main import app
+from models.product import Product
 
 
 # Test database setup

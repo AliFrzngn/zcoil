@@ -4,14 +4,29 @@ import pytest
 from unittest.mock import AsyncMock, patch
 from fastapi.testclient import TestClient
 
-from backend.crm_service.main import app
+import sys
+import os
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', '..'))
+from main import app
 
 
 @pytest.fixture(scope="function")
 def client():
     """Create a test client."""
+    from backend.shared.auth import get_current_customer
+    
+    def mock_get_current_customer():
+        return {
+            "user_id": "customer-123",
+            "email": "customer@example.com",
+            "role": "customer",
+            "permissions": []
+        }
+    
+    app.dependency_overrides[get_current_customer] = mock_get_current_customer
     with TestClient(app) as test_client:
         yield test_client
+    app.dependency_overrides.clear()
 
 
 @pytest.fixture

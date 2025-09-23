@@ -6,7 +6,7 @@ from jose import JWTError, jwt
 from fastapi import HTTPException, status, Depends
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 
-from ..config import settings
+from backend.shared.config import settings
 
 # Security scheme
 security = HTTPBearer()

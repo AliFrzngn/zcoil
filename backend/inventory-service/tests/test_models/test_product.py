@@ -1,7 +1,7 @@
 """Test product model."""
 
 import pytest
-from backend.inventory_service.models.product import Product
+from models.product import Product
 
 
 def test_product_creation():

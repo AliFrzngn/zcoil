@@ -43,7 +43,7 @@ app.add_middleware(
 )
 
 # Include API routes
-from .app.api.v1 import api_router
+from app.api.v1 import api_router
 app.include_router(api_router)
 
 

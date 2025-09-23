@@ -2,8 +2,8 @@
 
 import pytest
 from fastapi import HTTPException
-from backend.inventory_service.services.product_service import ProductService
-from backend.inventory_service.schemas.product import ProductCreate, ProductUpdate
+from services.product_service import ProductService
+from schemas.product import ProductCreate, ProductUpdate
 
 
 def test_create_product(db_session, sample_product_data):

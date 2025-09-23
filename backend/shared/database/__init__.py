@@ -5,7 +5,7 @@ from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.pool import QueuePool, NullPool
 
-from ..config import settings
+from backend.shared.config import settings
 
 # Create database engine with proper connection pooling
 if "sqlite" in settings.database_url:

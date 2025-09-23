@@ -6,8 +6,8 @@ from sqlalchemy import and_, or_, func
 from fastapi import HTTPException, status
 from datetime import datetime
 
-from ..models.notification import Notification
-from ..schemas.notification import NotificationCreate, NotificationUpdate, NotificationFilters
+from models.notification import Notification
+from schemas.notification import NotificationCreate, NotificationUpdate, NotificationFilters
 
 
 class NotificationService:

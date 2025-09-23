@@ -8,7 +8,7 @@ from typing import Optional, Dict, Any
 import logging
 from jinja2 import Template
 
-from ..config import settings
+from backend.shared.config import settings
 
 logger = logging.getLogger(__name__)
 

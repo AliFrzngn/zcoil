@@ -8,8 +8,8 @@ from passlib.context import CryptContext
 from datetime import datetime, timedelta
 import secrets
 
-from ..models.user import User
-from ..schemas.user import UserCreate, UserUpdate, UserFilter
+from models.user import User
+from schemas.user import UserCreate, UserUpdate, UserFilter
 from backend.shared.email import EmailService
 from backend.shared.audit import AuditService
 

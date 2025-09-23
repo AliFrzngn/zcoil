@@ -6,7 +6,7 @@ from sqlalchemy.orm import Session
 
 from backend.shared.database import get_db
 from backend.shared.audit import AuditService
-from ...services.auth_service import AuthService
+from services.auth_service import AuthService
 
 router = APIRouter(prefix="/audit", tags=["audit"])
 

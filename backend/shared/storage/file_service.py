@@ -11,7 +11,7 @@ import mimetypes
 from pathlib import Path
 
 from .models import FileUpload
-from ..config import settings
+from backend.shared.config import settings
 
 # File upload configuration
 UPLOAD_DIR = getattr(settings, 'UPLOAD_DIR', '/app/uploads')
