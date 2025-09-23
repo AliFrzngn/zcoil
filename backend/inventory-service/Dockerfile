@@ -41,7 +41,11 @@ HEALTHCHECK --interval=30s --timeout=30s --start-period=5s --retries=3 \
 <<<<<<< Current (Your changes)
 <<<<<<< Current (Your changes)
 <<<<<<< Current (Your changes)
+<<<<<<< Current (Your changes)
 CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]
+=======
+CMD ["python", "-m", "uvicorn", "backend.inventory_service.main:app", "--host", "0.0.0.0", "--port", "8001"]
+>>>>>>> Incoming (Background Agent changes)
 =======
 CMD ["python", "-m", "uvicorn", "backend.inventory_service.main:app", "--host", "0.0.0.0", "--port", "8001"]
 >>>>>>> Incoming (Background Agent changes)
