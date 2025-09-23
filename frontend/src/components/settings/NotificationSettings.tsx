@@ -1,8 +1,7 @@
 'use client';
 
-import { useState } from 'react';
+import React, { useState } from 'react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { notificationApi } from '@/lib/api';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
 import { Select } from '@/components/ui/Select';
@@ -41,11 +40,11 @@ export function NotificationSettings({ user }: NotificationSettingsProps) {
   });
 
   const handleEmailSettingChange = (setting: string, value: boolean) => {
-    setEmailSettings(prev => ({ ...prev, [setting]: value }));
+    setEmailSettings((prev: typeof emailSettings) => ({ ...prev, [setting]: value }));
   };
 
   const handlePushSettingChange = (setting: string, value: boolean) => {
-    setPushSettings(prev => ({ ...prev, [setting]: value }));
+    setPushSettings((prev: typeof pushSettings) => ({ ...prev, [setting]: value }));
   };
 
   const handleSave = () => {
@@ -82,9 +81,11 @@ export function NotificationSettings({ user }: NotificationSettingsProps) {
               </div>
               <input
                 type="checkbox"
+                id="product_updates"
                 checked={emailSettings.product_updates}
-                onChange={(e) => handleEmailSettingChange('product_updates', e.target.checked)}
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleEmailSettingChange('product_updates', e.target.checked)}
                 className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                aria-label="Product updates notifications"
               />
             </div>
 
@@ -97,9 +98,11 @@ export function NotificationSettings({ user }: NotificationSettingsProps) {
               </div>
               <input
                 type="checkbox"
+                id="low_stock_alerts"
                 checked={emailSettings.low_stock_alerts}
-                onChange={(e) => handleEmailSettingChange('low_stock_alerts', e.target.checked)}
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleEmailSettingChange('low_stock_alerts', e.target.checked)}
                 className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                aria-label="Low stock alerts notifications"
               />
             </div>
 
@@ -112,9 +115,11 @@ export function NotificationSettings({ user }: NotificationSettingsProps) {
               </div>
               <input
                 type="checkbox"
+                id="system_notifications"
                 checked={emailSettings.system_notifications}
-                onChange={(e) => handleEmailSettingChange('system_notifications', e.target.checked)}
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleEmailSettingChange('system_notifications', e.target.checked)}
                 className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                aria-label="System notifications"
               />
             </div>
 
@@ -127,9 +132,11 @@ export function NotificationSettings({ user }: NotificationSettingsProps) {
               </div>
               <input
                 type="checkbox"
+                id="marketing_emails"
                 checked={emailSettings.marketing_emails}
-                onChange={(e) => handleEmailSettingChange('marketing_emails', e.target.checked)}
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleEmailSettingChange('marketing_emails', e.target.checked)}
                 className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                aria-label="Marketing emails"
               />
             </div>
           </div>
@@ -153,9 +160,11 @@ export function NotificationSettings({ user }: NotificationSettingsProps) {
               </div>
               <input
                 type="checkbox"
+                id="push_product_updates"
                 checked={pushSettings.product_updates}
-                onChange={(e) => handlePushSettingChange('product_updates', e.target.checked)}
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) => handlePushSettingChange('product_updates', e.target.checked)}
                 className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                aria-label="Push notifications for product updates"
               />
             </div>
 
@@ -168,9 +177,11 @@ export function NotificationSettings({ user }: NotificationSettingsProps) {
               </div>
               <input
                 type="checkbox"
+                id="push_low_stock_alerts"
                 checked={pushSettings.low_stock_alerts}
-                onChange={(e) => handlePushSettingChange('low_stock_alerts', e.target.checked)}
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) => handlePushSettingChange('low_stock_alerts', e.target.checked)}
                 className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                aria-label="Push notifications for low stock alerts"
               />
             </div>
 
@@ -183,9 +194,11 @@ export function NotificationSettings({ user }: NotificationSettingsProps) {
               </div>
               <input
                 type="checkbox"
+                id="push_system_notifications"
                 checked={pushSettings.system_notifications}
-                onChange={(e) => handlePushSettingChange('system_notifications', e.target.checked)}
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) => handlePushSettingChange('system_notifications', e.target.checked)}
                 className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                aria-label="Push notifications for system updates"
               />
             </div>
           </div>
@@ -203,7 +216,7 @@ export function NotificationSettings({ user }: NotificationSettingsProps) {
             <Select
               label="Email Frequency"
               value={frequency}
-              onChange={(e) => setFrequency(e.target.value)}
+                onChange={(e: React.ChangeEvent<HTMLSelectElement>) => setFrequency(e.target.value)}
               options={frequencyOptions}
             />
             <p className="mt-1 text-sm text-gray-500">

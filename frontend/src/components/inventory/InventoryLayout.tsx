@@ -48,6 +48,7 @@ export function InventoryLayout({ children, user }: InventoryLayoutProps) {
               type="button"
               className="text-gray-400 hover:text-gray-600"
               onClick={() => setSidebarOpen(false)}
+              aria-label="Close sidebar"
             >
               <XMarkIcon className="h-6 w-6" />
             </button>
@@ -96,6 +97,7 @@ export function InventoryLayout({ children, user }: InventoryLayoutProps) {
             type="button"
             className="-m-2.5 p-2.5 text-gray-700 lg:hidden"
             onClick={() => setSidebarOpen(true)}
+            aria-label="Open sidebar"
           >
             <Bars3Icon className="h-6 w-6" />
           </button>

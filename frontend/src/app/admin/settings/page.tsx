@@ -147,9 +147,11 @@ export default function AdminSettingsPage() {
                 </div>
                 <input
                   type="checkbox"
+                  id="email_verification_required"
                   checked={settings.email_verification_required}
                   onChange={(e) => handleChange('email_verification_required', e.target.checked)}
                   className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                  aria-label="Email verification required"
                 />
               </div>
 
@@ -162,9 +164,11 @@ export default function AdminSettingsPage() {
                 </div>
                 <input
                   type="checkbox"
+                  id="user_registration_enabled"
                   checked={settings.user_registration_enabled}
                   onChange={(e) => handleChange('user_registration_enabled', e.target.checked)}
                   className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                  aria-label="User registration enabled"
                 />
               </div>
 
@@ -177,9 +181,11 @@ export default function AdminSettingsPage() {
                 </div>
                 <input
                   type="checkbox"
+                  id="maintenance_mode"
                   checked={settings.maintenance_mode}
                   onChange={(e) => handleChange('maintenance_mode', e.target.checked)}
                   className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                  aria-label="Maintenance mode"
                 />
               </div>
             </div>
