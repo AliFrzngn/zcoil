@@ -7,13 +7,15 @@ from fastapi.testclient import TestClient
 import sys
 import os
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', '..'))
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', '..', '..'))
+
 from main import app
 
 
 @pytest.fixture(scope="function")
 def client():
     """Create a test client."""
-    from backend.shared.auth import get_current_customer
+    from shared.auth import get_current_customer
     
     def mock_get_current_customer():
         return {

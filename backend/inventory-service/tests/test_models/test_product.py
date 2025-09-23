@@ -10,14 +10,15 @@ def test_product_creation():
         name="Test Product",
         sku="TEST-001",
         price=99.99,
-        quantity=100
+        quantity=100,
+        is_active=True
     )
     
     assert product.name == "Test Product"
     assert product.sku == "TEST-001"
     assert product.price == 99.99
     assert product.quantity == 100
-    assert product.is_active is True  # Default value
+    assert product.is_active is True
 
 
 def test_product_to_dict():

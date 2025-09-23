@@ -44,7 +44,7 @@ def test_get_my_items_success(client, mock_customer, mock_inventory_response):
 
 def test_get_my_items_unauthorized(client):
     """Test getting my items without authentication."""
-    with patch('backend.shared.auth.get_current_customer') as mock_auth:
+        with patch('shared.auth.get_current_customer') as mock_auth:
         from fastapi import HTTPException
         mock_auth.side_effect = HTTPException(status_code=401, detail="Unauthorized")
         
@@ -55,7 +55,7 @@ def test_get_my_items_unauthorized(client):
 
 def test_get_my_item_success(client, mock_customer, mock_product_details):
     """Test getting specific item successfully."""
-    with patch('backend.shared.utils.HTTPClient') as mock_http_client:
+        with patch('shared.utils.HTTPClient') as mock_http_client:
         from schemas.customer import CustomerProductResponse
         from datetime import datetime
         
@@ -89,7 +89,7 @@ def test_get_my_item_success(client, mock_customer, mock_product_details):
 
 def test_get_my_item_not_found(client, mock_customer):
     """Test getting non-existent item."""
-    with patch('backend.shared.auth.get_current_customer') as mock_auth:
+        with patch('shared.auth.get_current_customer') as mock_auth:
         mock_auth.return_value = mock_customer
         
         with patch('services.customer_service.CustomerService.get_customer_product_details') as mock_service:
@@ -103,7 +103,7 @@ def test_get_my_item_not_found(client, mock_customer):
 
 def test_get_my_item_wrong_customer(client, mock_customer):
     """Test getting item that doesn't belong to customer."""
-    with patch('backend.shared.auth.get_current_customer') as mock_auth:
+        with patch('shared.auth.get_current_customer') as mock_auth:
         mock_auth.return_value = mock_customer
         
         with patch('services.customer_service.CustomerService.get_customer_product_details') as mock_service:
@@ -150,7 +150,7 @@ def test_search_my_items_success(client, mock_customer, mock_inventory_response)
 
 def test_search_my_items_no_filters(client, mock_customer):
     """Test searching my items without filters."""
-    with patch('backend.shared.auth.get_current_customer') as mock_auth:
+        with patch('shared.auth.get_current_customer') as mock_auth:
         mock_auth.return_value = mock_customer
         
         with patch('services.customer_service.CustomerService.search_customer_products') as mock_service:
@@ -166,7 +166,7 @@ def test_search_my_items_no_filters(client, mock_customer):
 
 def test_search_my_items_service_error(client, mock_customer):
     """Test searching my items with service error."""
-    with patch('backend.shared.auth.get_current_customer') as mock_auth:
+        with patch('shared.auth.get_current_customer') as mock_auth:
         mock_auth.return_value = mock_customer
         
         with patch('services.customer_service.CustomerService.search_customer_products') as mock_service:

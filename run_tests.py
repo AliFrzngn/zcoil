@@ -36,17 +36,14 @@ def run_command(command, cwd=None):
 def main():
     """Run all tests."""
     print("=" * 60)
-    print("AliFrzngn Development - Microservices Test Runner")
+    print("ZCoil Microservices - Comprehensive Test Runner")
     print("=" * 60)
     
     # Set up environment
-    os.environ["PYTHONPATH"] = "/workspace"
+    os.environ["PYTHONPATH"] = os.getcwd()
     os.environ["DATABASE_URL"] = "sqlite:///./test.db"
     os.environ["JWT_SECRET_KEY"] = "test-secret-key"
     os.environ["ENVIRONMENT"] = "test"
-    
-    # Change to workspace directory
-    os.chdir("/workspace")
     
     success = True
     
@@ -56,10 +53,7 @@ def main():
     print("=" * 40)
     
     inventory_tests = [
-        "python -m pytest backend/inventory-service/tests/ -v",
-        "python -c 'from backend.inventory_service.main import app; print(\"Inventory service imports successfully\")'",
-        "python -c 'from backend.inventory_service.models.product import Product; print(\"Product model imports successfully\")'",
-        "python -c 'from backend.inventory_service.services.product_service import ProductService; print(\"Product service imports successfully\")'",
+        "python -m pytest backend/inventory-service/tests/ -v --tb=short",
     ]
     
     for test in inventory_tests:
@@ -72,42 +66,49 @@ def main():
     print("=" * 40)
     
     crm_tests = [
-        "python -m pytest backend/crm-service/tests/ -v",
-        "python -c 'from backend.crm_service.main import app; print(\"CRM service imports successfully\")'",
-        "python -c 'from backend.crm_service.services.customer_service import CustomerService; print(\"Customer service imports successfully\")'",
+        "python -m pytest backend/crm-service/tests/ -v --tb=short",
     ]
     
     for test in crm_tests:
         if not run_command(test):
             success = False
     
-    # Test Shared Components
+    # Test User Service
     print("\n" + "=" * 40)
-    print("Testing Shared Components")
+    print("Testing User Service")
     print("=" * 40)
     
-    shared_tests = [
-        "python -c 'from backend.shared.config import settings; print(f\"Config loaded: {settings.service_name}\")'",
-        "python -c 'from backend.shared.database import get_db; print(\"Database module imports successfully\")'",
-        "python -c 'from backend.shared.auth import create_access_token; print(\"Auth module imports successfully\")'",
-        "python -c 'from backend.shared.utils import HTTPClient; print(\"Utils module imports successfully\")'",
+    user_tests = [
+        "python -m pytest backend/user-service/tests/ -v --tb=short",
     ]
     
-    for test in shared_tests:
+    for test in user_tests:
         if not run_command(test):
             success = False
     
-    # Test Integration
+    # Test Notification Service
     print("\n" + "=" * 40)
-    print("Testing Integration")
+    print("Testing Notification Service")
     print("=" * 40)
     
-    integration_tests = [
-        "python -c 'from backend.inventory_service.schemas.product import ProductCreate; print(\"Inventory schemas work\")'",
-        "python -c 'from backend.crm_service.schemas.customer import CustomerProductResponse; print(\"CRM schemas work\")'",
+    notification_tests = [
+        "python -m pytest backend/notification-service/tests/ -v --tb=short",
     ]
     
-    for test in integration_tests:
+    for test in notification_tests:
+        if not run_command(test):
+            success = False
+    
+    # Test All Services Together
+    print("\n" + "=" * 40)
+    print("Running All Tests Together")
+    print("=" * 40)
+    
+    all_tests = [
+        "python -m pytest backend/ -v --tb=short --cov=backend --cov-report=term-missing",
+    ]
+    
+    for test in all_tests:
         if not run_command(test):
             success = False
     
