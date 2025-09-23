@@ -1,3 +1,6 @@
+# Nginx configuration template for different environments
+# This template can be used with environment variable substitution
+
 user nginx;
 worker_processes auto;
 error_log /var/log/nginx/error.log notice;
@@ -45,34 +48,34 @@ http {
         image/svg+xml;
 
     # Rate Limiting
-    limit_req_zone $binary_remote_addr zone=api:10m rate=10r/s;
-    limit_req_zone $binary_remote_addr zone=auth:10m rate=5r/s;
+    limit_req_zone $binary_remote_addr zone=api:10m rate=${RATE_LIMIT_API:-10}r/s;
+    limit_req_zone $binary_remote_addr zone=auth:10m rate=${RATE_LIMIT_AUTH:-5}r/s;
 
     # Upstream Services
     upstream user_service {
-        server user-service:8003;
+        server ${USER_SERVICE_HOST:-user-service}:${USER_SERVICE_PORT:-8003};
         keepalive 32;
     }
 
     upstream inventory_service {
-        server inventory-service:8001;
+        server ${INVENTORY_SERVICE_HOST:-inventory-service}:${INVENTORY_SERVICE_PORT:-8001};
         keepalive 32;
     }
 
     upstream crm_service {
-        server crm-service:8002;
+        server ${CRM_SERVICE_HOST:-crm-service}:${CRM_SERVICE_PORT:-8002};
         keepalive 32;
     }
 
     upstream frontend {
-        server frontend:3000;
+        server ${FRONTEND_HOST:-frontend}:${FRONTEND_PORT:-3000};
         keepalive 32;
     }
 
     # Main Server Block
     server {
-        listen 80;
-        server_name localhost;
+        listen ${NGINX_PORT:-80};
+        server_name ${NGINX_SERVER_NAME:-localhost};
 
         # Security Headers
         add_header X-Frame-Options "SAMEORIGIN" always;
@@ -82,23 +85,10 @@ http {
         add_header Content-Security-Policy "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; font-src 'self' data:; connect-src 'self' http://localhost:*;" always;
 
         # CORS Headers
-        add_header Access-Control-Allow-Origin "http://localhost:3000" always;
+        add_header Access-Control-Allow-Origin "${CORS_ORIGIN:-http://localhost:3000}" always;
         add_header Access-Control-Allow-Methods "GET, POST, PUT, DELETE, OPTIONS" always;
         add_header Access-Control-Allow-Headers "Authorization, Content-Type, Accept" always;
         add_header Access-Control-Allow-Credentials "true" always;
-
-        # Handle preflight requests
-        location / {
-            if ($request_method = 'OPTIONS') {
-                add_header Access-Control-Allow-Origin "http://localhost:3000";
-                add_header Access-Control-Allow-Methods "GET, POST, PUT, DELETE, OPTIONS";
-                add_header Access-Control-Allow-Headers "Authorization, Content-Type, Accept";
-                add_header Access-Control-Allow-Credentials "true";
-                add_header Content-Length 0;
-                add_header Content-Type text/plain;
-                return 204;
-            }
-        }
 
         # Health Check Endpoint
         location /health {
@@ -167,31 +157,5 @@ http {
             proxy_send_timeout 30s;
             proxy_read_timeout 30s;
         }
-
-        # Error Pages
-        error_page 404 /404.html;
-        error_page 500 502 503 504 /50x.html;
-        
-        location = /50x.html {
-            root /usr/share/nginx/html;
-        }
     }
-
-    # HTTPS Server Block (for production)
-    # server {
-    #     listen 443 ssl http2;
-    #     server_name localhost;
-    #     
-    #     ssl_certificate /etc/nginx/ssl/cert.pem;
-    #     ssl_certificate_key /etc/nginx/ssl/key.pem;
-    #     
-    #     # SSL Configuration
-    #     ssl_protocols TLSv1.2 TLSv1.3;
-    #     ssl_ciphers ECDHE-RSA-AES256-GCM-SHA512:DHE-RSA-AES256-GCM-SHA512:ECDHE-RSA-AES256-GCM-SHA384:DHE-RSA-AES256-GCM-SHA384;
-    #     ssl_prefer_server_ciphers off;
-    #     ssl_session_cache shared:SSL:10m;
-    #     ssl_session_timeout 10m;
-    #     
-    #     # Include the same location blocks as above
-    # }
 }
