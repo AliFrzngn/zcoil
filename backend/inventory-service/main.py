@@ -4,15 +4,10 @@ from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from contextlib import asynccontextmanager
 import logging
-import uvicorn
-
-import sys
-import os
-sys.path.append(os.path.join(os.path.dirname(__file__), '..', '..'))
 
 from backend.shared.config import settings
 from backend.shared.database import create_tables
-from app.api.v1 import api_router
+from .app.api.v1 import api_router
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -76,6 +71,7 @@ async def root():
 
 
 if __name__ == "__main__":
+    import uvicorn
     uvicorn.run(
         "main:app",
         host="0.0.0.0",

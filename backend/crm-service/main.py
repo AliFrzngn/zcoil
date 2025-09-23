@@ -69,9 +69,6 @@ async def root():
 
 
 if __name__ == "__main__":
-<<<<<<< Current (Your changes)
-    uvicorn.run(app, host="0.0.0.0", port=8000)
-=======
     import uvicorn
     uvicorn.run(
         "main:app",
@@ -80,4 +77,3 @@ if __name__ == "__main__":
         reload=settings.debug,
         log_level="info"
     )
->>>>>>> Incoming (Background Agent changes)

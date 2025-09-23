@@ -4,24 +4,19 @@ const nextConfig = {
     appDir: true,
   },
   env: {
-    NEXT_PUBLIC_API_URL: process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000',
+    NEXT_PUBLIC_API_URL: process.env.NEXT_PUBLIC_API_URL || 'http://localhost:80',
+    NEXT_PUBLIC_APP_NAME: 'AliFrzngn Development',
+  },
+  images: {
+    domains: ['localhost'],
   },
   async rewrites() {
     return [
       {
         source: '/api/:path*',
-        destination: `${process.env.NEXT_PUBLIC_API_URL}/api/:path*`,
+        destination: 'http://localhost:80/api/:path*',
       },
     ];
-  },
-  images: {
-    domains: ['localhost'],
-  },
-  typescript: {
-    ignoreBuildErrors: false,
-  },
-  eslint: {
-    ignoreDuringBuilds: false,
   },
 };
 

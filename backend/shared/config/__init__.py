@@ -2,8 +2,7 @@
 
 import os
 from typing import Optional
-from pydantic import Field
-from pydantic_settings import BaseSettings
+from pydantic import BaseSettings, Field
 
 
 class Settings(BaseSettings):
@@ -11,7 +10,7 @@ class Settings(BaseSettings):
     
     # Database settings
     database_url: str = Field(
-        default="sqlite:///./inventory.db",
+        default="postgresql://postgres:postgres@localhost:5432/ali_frzngn_dev",
         env="DATABASE_URL"
     )
     

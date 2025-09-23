@@ -5,14 +5,14 @@ from fastapi import APIRouter, Depends, HTTPException, status, Query
 from sqlalchemy.orm import Session
 
 from backend.shared.database import get_db
-from schemas.product import (
+from ...schemas.product import (
     ProductCreate,
     ProductUpdate,
     ProductResponse,
     ProductListResponse,
     ProductFilter
 )
-from services.product_service import ProductService
+from ...services.product_service import ProductService
 
 router = APIRouter(prefix="/items", tags=["items"])
 

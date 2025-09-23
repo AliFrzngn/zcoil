@@ -1,6 +1,3 @@
-<<<<<<< Current (Your changes)
-# Authentication and authorization utilities
-=======
 """Authentication utilities."""
 
 from datetime import datetime, timedelta
@@ -69,4 +66,3 @@ def get_current_customer(credentials: HTTPAuthorizationCredentials = Depends(sec
     # For this implementation, we'll assume all authenticated users are customers
     # In a real system, you might want to check roles or permissions
     return user
->>>>>>> Incoming (Background Agent changes)

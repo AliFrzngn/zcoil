@@ -1,6 +1,3 @@
-<<<<<<< Current (Your changes)
-# Utility functions and helpers
-=======
 """Shared utilities."""
 
 import logging
@@ -84,4 +81,3 @@ def create_error_response(message: str, status_code: int = 400) -> Dict[str, Any
         "status_code": status_code,
         "timestamp": time.time()
     }
->>>>>>> Incoming (Background Agent changes)

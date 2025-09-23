@@ -5,8 +5,8 @@ from sqlalchemy.orm import Session
 from sqlalchemy import and_, or_, func
 from fastapi import HTTPException, status
 
-from models.product import Product
-from schemas.product import ProductCreate, ProductUpdate, ProductFilter
+from ..models.product import Product
+from ..schemas.product import ProductCreate, ProductUpdate, ProductFilter
 
 
 class ProductService:
