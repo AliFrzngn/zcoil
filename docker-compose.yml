@@ -6,9 +6,9 @@ services:
     image: postgres:15-alpine
     container_name: alifrzngn-postgres
     environment:
-      POSTGRES_DB: ali_frzngn_dev
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: ${POSTGRES_DB:-ali_frzngn_dev}
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-}
     ports:
       - "5432:5432"
     volumes:
@@ -41,9 +41,9 @@ services:
       dockerfile: backend/user-service/Dockerfile
     container_name: alifrzngn-user-service
     environment:
-      - DATABASE_URL=postgresql://postgres:postgres@postgres:5432/ali_frzngn_dev
+      - DATABASE_URL=${DATABASE_URL:-postgresql://postgres:${POSTGRES_PASSWORD:-}@postgres:5432/${POSTGRES_DB:-ali_frzngn_dev}}
       - REDIS_URL=redis://redis:6379
-      - JWT_SECRET_KEY=your-secret-key-change-in-production
+      - JWT_SECRET_KEY=${JWT_SECRET_KEY:-}
       - SERVICE_NAME=user-service
       - ENVIRONMENT=development
       - DEBUG=true
@@ -73,9 +73,9 @@ services:
       dockerfile: backend/inventory-service/Dockerfile
     container_name: alifrzngn-inventory-service
     environment:
-      - DATABASE_URL=postgresql://postgres:postgres@postgres:5432/ali_frzngn_dev
+      - DATABASE_URL=${DATABASE_URL:-postgresql://postgres:${POSTGRES_PASSWORD:-}@postgres:5432/${POSTGRES_DB:-ali_frzngn_dev}}
       - REDIS_URL=redis://redis:6379
-      - JWT_SECRET_KEY=your-secret-key-change-in-production
+      - JWT_SECRET_KEY=${JWT_SECRET_KEY:-}
       - SERVICE_NAME=inventory-service
       - ENVIRONMENT=development
       - DEBUG=true
@@ -101,9 +101,9 @@ services:
       dockerfile: backend/crm-service/Dockerfile
     container_name: alifrzngn-crm-service
     environment:
-      - DATABASE_URL=postgresql://postgres:postgres@postgres:5432/ali_frzngn_dev
+      - DATABASE_URL=${DATABASE_URL:-postgresql://postgres:${POSTGRES_PASSWORD:-}@postgres:5432/${POSTGRES_DB:-ali_frzngn_dev}}
       - REDIS_URL=redis://redis:6379
-      - JWT_SECRET_KEY=your-secret-key-change-in-production
+      - JWT_SECRET_KEY=${JWT_SECRET_KEY:-}
       - INVENTORY_SERVICE_URL=http://inventory-service:8001
       - SERVICE_NAME=crm-service
       - ENVIRONMENT=development
@@ -174,7 +174,7 @@ services:
       dockerfile: backend/shared/database/Dockerfile
     container_name: alifrzngn-migrate
     environment:
-      - DATABASE_URL=postgresql://postgres:postgres@postgres:5432/ali_frzngn_dev
+      - DATABASE_URL=${DATABASE_URL:-postgresql://postgres:${POSTGRES_PASSWORD:-}@postgres:5432/${POSTGRES_DB:-ali_frzngn_dev}}
     depends_on:
       postgres:
         condition: service_healthy

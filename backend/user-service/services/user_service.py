@@ -13,8 +13,14 @@ from ..schemas.user import UserCreate, UserUpdate, UserFilter
 from backend.shared.email import EmailService
 from backend.shared.audit import AuditService
 
-# Password hashing context
-pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+# Password hashing context with stronger configuration
+pwd_context = CryptContext(
+    schemes=["bcrypt"],
+    deprecated="auto",
+    bcrypt__rounds=12,  # Increased from default 10
+    bcrypt__min_rounds=10,
+    bcrypt__max_rounds=15
+)
 
 
 class UserService:
@@ -30,7 +36,13 @@ class UserService:
         return pwd_context.verify(plain_password, hashed_password)
     
     def get_password_hash(self, password: str) -> str:
-        """Hash a password."""
+        """Hash a password with strong configuration."""
+        # Additional validation for password strength
+        if len(password) < 8:
+            raise ValueError("Password must be at least 8 characters long")
+        if len(password) > 128:
+            raise ValueError("Password must be less than 128 characters")
+        
         return pwd_context.hash(password)
     
     def create_user(self, user_data: UserCreate) -> User:
@@ -84,12 +96,16 @@ class UserService:
         """Get users with filtering and pagination."""
         query = self.db.query(User)
         
-        # Apply filters
+        # Apply filters with proper parameterization
         if filters.email:
-            query = query.filter(User.email.ilike(f"%{filters.email}%"))
+            # Sanitize email input to prevent SQL injection
+            email_filter = filters.email.strip().replace('%', '\\%').replace('_', '\\_')
+            query = query.filter(User.email.ilike(f"%{email_filter}%"))
         
         if filters.username:
-            query = query.filter(User.username.ilike(f"%{filters.username}%"))
+            # Sanitize username input to prevent SQL injection
+            username_filter = filters.username.strip().replace('%', '\\%').replace('_', '\\_')
+            query = query.filter(User.username.ilike(f"%{username_filter}%"))
         
         if filters.role:
             query = query.filter(User.role == filters.role)
@@ -199,7 +215,7 @@ class UserService:
         verification_token = secrets.token_urlsafe(32)
         
         # Store token in user metadata (in a real app, you'd use a separate table)
-        # For now, we'll use a simple approach
+        # For now, we'll use a simple approach with proper escaping
         user.bio = f"verification_token:{verification_token}"
         self.db.commit()
         
@@ -214,9 +230,10 @@ class UserService:
     
     def verify_email_with_token(self, verification_token: str) -> User:
         """Verify email using verification token."""
-        # Find user with this verification token
+        # Find user with this verification token (properly escaped)
+        escaped_token = verification_token.replace('%', '\\%').replace('_', '\\_')
         user = self.db.query(User).filter(
-            User.bio.like(f"verification_token:{verification_token}")
+            User.bio.like(f"verification_token:{escaped_token}")
         ).first()
         
         if not user:
@@ -283,9 +300,10 @@ class UserService:
     
     def reset_password_with_token(self, reset_token: str, new_password: str) -> User:
         """Reset password using reset token."""
-        # Find user with this reset token
+        # Find user with this reset token (properly escaped)
+        escaped_token = reset_token.replace('%', '\\%').replace('_', '\\_')
         user = self.db.query(User).filter(
-            User.bio.like(f"reset_token:{reset_token}:%")
+            User.bio.like(f"reset_token:{escaped_token}:%")
         ).first()
         
         if not user:

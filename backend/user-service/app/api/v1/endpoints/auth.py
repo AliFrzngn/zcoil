@@ -11,6 +11,16 @@ from ...services.user_service import UserService
 router = APIRouter(prefix="/auth", tags=["authentication"])
 
 
+def get_auth_service(db: Session = Depends(get_db)) -> AuthService:
+    """Get auth service instance."""
+    return AuthService(db)
+
+
+def get_current_user_dependency(auth_service: AuthService = Depends(get_auth_service)) -> dict:
+    """Get current user dependency."""
+    return auth_service.get_current_user()
+
+
 @router.post("/register", response_model=UserResponse, status_code=status.HTTP_201_CREATED)
 async def register(
     user_data: UserRegister,
@@ -49,11 +59,14 @@ async def login(
 
 @router.get("/me", response_model=UserResponse)
 async def get_current_user_info(
-    current_user: dict = Depends(AuthService(get_db()).get_current_user)
+    current_user: dict = Depends(get_current_user_dependency)
 ):
     """Get current user information."""
-    # This will be handled by the dependency injection
-    pass
+    # Get user details from database
+    db = next(get_db())
+    user_service = UserService(db)
+    user = user_service.get_user(int(current_user["user_id"]))
+    return user
 
 
 @router.post("/verify-email/{user_id}")
@@ -69,10 +82,11 @@ async def verify_email(
 
 @router.post("/refresh-token", response_model=Token)
 async def refresh_token(
-    current_user: dict = Depends(AuthService(get_db()).get_current_user)
+    current_user: dict = Depends(get_current_user_dependency)
 ):
     """Refresh access token."""
-    auth_service = AuthService(get_db())
+    db = next(get_db())
+    auth_service = AuthService(db)
     access_token = auth_service.create_access_token_for_user(current_user)
     
     return Token(
