@@ -55,13 +55,46 @@ class FileService:
                 hash_md5.update(chunk)
         return hash_md5.hexdigest()
     
+    def _validate_file_content(self, content: bytes, content_type: str) -> None:
+        """Validate file content for malicious patterns."""
+        # Check for common malicious file signatures
+        malicious_signatures = [
+            b'<script', b'javascript:', b'vbscript:', b'onload=',
+            b'<?php', b'<?=', b'<iframe', b'<object', b'<embed',
+            b'exec(', b'eval(', b'system(', b'shell_exec('
+        ]
+        
+        content_lower = content.lower()
+        for signature in malicious_signatures:
+            if signature in content_lower:
+                raise HTTPException(
+                    status_code=status.HTTP_400_BAD_REQUEST,
+                    detail="File contains potentially malicious content"
+                )
+        
+        # Additional validation for specific file types
+        if content_type.startswith('image/'):
+            # Basic image file validation
+            if not content.startswith((b'\xff\xd8\xff', b'\x89PNG', b'GIF8')):
+                raise HTTPException(
+                    status_code=status.HTTP_400_BAD_REQUEST,
+                    detail="Invalid image file format"
+                )
+    
     def _validate_file(self, file: UploadFile) -> None:
-        """Validate uploaded file."""
+        """Validate uploaded file with enhanced security checks."""
         # Check file size
         if hasattr(file, 'size') and file.size and file.size > MAX_FILE_SIZE:
             raise HTTPException(
                 status_code=status.HTTP_413_REQUEST_ENTITY_TOO_LARGE,
                 detail=f"File size exceeds maximum allowed size of {MAX_FILE_SIZE} bytes"
+            )
+        
+        # Validate filename to prevent path traversal
+        if not file.filename or '..' in file.filename or '/' in file.filename or '\\' in file.filename:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Invalid filename"
             )
         
         # Check content type
@@ -77,6 +110,14 @@ class FileService:
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
                 detail=f"File extension {file_ext} is not allowed"
+            )
+        
+        # Additional security: Check for executable files
+        dangerous_extensions = {'.exe', '.bat', '.cmd', '.scr', '.pif', '.com', '.vbs', '.js', '.jar', '.sh'}
+        if file_ext in dangerous_extensions:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Executable files are not allowed"
             )
     
     async def upload_file(
@@ -102,9 +143,13 @@ class FileService:
             
             file_path = subdir / filename
             
-            # Save file to disk
+            # Save file to disk with content validation
             async with aiofiles.open(file_path, 'wb') as f:
                 content = await file.read()
+                
+                # Validate file content for malicious patterns
+                self._validate_file_content(content, file.content_type)
+                
                 await f.write(content)
             
             # Get file size

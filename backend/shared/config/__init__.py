@@ -2,7 +2,7 @@
 
 import os
 from typing import Optional
-from pydantic import BaseSettings, Field
+from pydantic import BaseSettings, Field, validator
 
 
 class Settings(BaseSettings):
@@ -22,8 +22,9 @@ class Settings(BaseSettings):
     
     # JWT settings
     jwt_secret_key: str = Field(
-        default="your-secret-key-change-in-production",
-        env="JWT_SECRET_KEY"
+        default="",
+        env="JWT_SECRET_KEY",
+        description="JWT secret key for token signing (required in production)"
     )
     jwt_algorithm: str = Field(default="HS256", env="JWT_ALGORITHM")
     jwt_access_token_expire_minutes: int = Field(
@@ -42,6 +43,16 @@ class Settings(BaseSettings):
         default=["http://localhost:3000", "http://localhost:80"],
         env="CORS_ORIGINS"
     )
+    cors_allow_credentials: bool = Field(default=True, env="CORS_ALLOW_CREDENTIALS")
+    cors_allow_methods: list[str] = Field(
+        default=["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+        env="CORS_ALLOW_METHODS"
+    )
+    cors_allow_headers: list[str] = Field(
+        default=["*"],
+        env="CORS_ALLOW_HEADERS"
+    )
+    cors_max_age: int = Field(default=600, env="CORS_MAX_AGE")
     
     # Inventory Service settings
     inventory_service_url: str = Field(
@@ -86,6 +97,13 @@ class Settings(BaseSettings):
         default="http://localhost:3000",
         env="FRONTEND_URL"
     )
+    
+    @validator('jwt_secret_key')
+    def validate_jwt_secret(cls, v, values):
+        """Validate JWT secret key is not empty in production."""
+        if values.get('environment') == 'production' and not v:
+            raise ValueError('JWT_SECRET_KEY is required in production environment')
+        return v
     
     class Config:
         env_file = ".env"

@@ -13,6 +13,166 @@ from ..config import settings
 logger = logging.getLogger(__name__)
 
 
+class EmailTemplates:
+    """Email templates for various email types."""
+    
+    @staticmethod
+    def get_verification_email_html(user_name: str, verification_url: str) -> str:
+        """Get HTML content for verification email."""
+        return f"""
+        <!DOCTYPE html>
+        <html>
+        <head>
+            <meta charset="utf-8">
+            <title>Verify Your Email - AliFrzngn Development</title>
+        </head>
+        <body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333;">
+            <div style="max-width: 600px; margin: 0 auto; padding: 20px;">
+                <h2 style="color: #2c3e50;">Welcome to AliFrzngn Development!</h2>
+                <p>Hello {user_name},</p>
+                <p>Thank you for registering with AliFrzngn Development. Please verify your email address by clicking the button below:</p>
+                <div style="text-align: center; margin: 30px 0;">
+                    <a href="{verification_url}" style="background-color: #3498db; color: white; padding: 12px 24px; text-decoration: none; border-radius: 5px; display: inline-block;">Verify Email Address</a>
+                </div>
+                <p>If the button doesn't work, you can copy and paste this link into your browser:</p>
+                <p style="word-break: break-all; color: #666;">{verification_url}</p>
+                <p>This link will expire in 24 hours.</p>
+                <p>If you didn't create an account with us, please ignore this email.</p>
+                <hr style="margin: 30px 0; border: none; border-top: 1px solid #eee;">
+                <p style="font-size: 12px; color: #666;">© 2025 AliFrzngn Development. All rights reserved.</p>
+            </div>
+        </body>
+        </html>
+        """
+    
+    @staticmethod
+    def get_verification_email_text(user_name: str, verification_url: str) -> str:
+        """Get text content for verification email."""
+        return f"""
+        Welcome to AliFrzngn Development!
+        
+        Hello {user_name},
+        
+        Thank you for registering with AliFrzngn Development. Please verify your email address by visiting the following link:
+        
+        {verification_url}
+        
+        This link will expire in 24 hours.
+        
+        If you didn't create an account with us, please ignore this email.
+        
+        Best regards,
+        AliFrzngn Development Team
+        """
+    
+    @staticmethod
+    def get_password_reset_email_html(user_name: str, reset_url: str) -> str:
+        """Get HTML content for password reset email."""
+        return f"""
+        <!DOCTYPE html>
+        <html>
+        <head>
+            <meta charset="utf-8">
+            <title>Reset Your Password - AliFrzngn Development</title>
+        </head>
+        <body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333;">
+            <div style="max-width: 600px; margin: 0 auto; padding: 20px;">
+                <h2 style="color: #e74c3c;">Password Reset Request</h2>
+                <p>Hello {user_name},</p>
+                <p>We received a request to reset your password for your AliFrzngn Development account.</p>
+                <p>Click the button below to reset your password:</p>
+                <div style="text-align: center; margin: 30px 0;">
+                    <a href="{reset_url}" style="background-color: #e74c3c; color: white; padding: 12px 24px; text-decoration: none; border-radius: 5px; display: inline-block;">Reset Password</a>
+                </div>
+                <p>If the button doesn't work, you can copy and paste this link into your browser:</p>
+                <p style="word-break: break-all; color: #666;">{reset_url}</p>
+                <p>This link will expire in 1 hour for security reasons.</p>
+                <p>If you didn't request a password reset, please ignore this email and your password will remain unchanged.</p>
+                <hr style="margin: 30px 0; border: none; border-top: 1px solid #eee;">
+                <p style="font-size: 12px; color: #666;">© 2025 AliFrzngn Development. All rights reserved.</p>
+            </div>
+        </body>
+        </html>
+        """
+    
+    @staticmethod
+    def get_password_reset_email_text(user_name: str, reset_url: str) -> str:
+        """Get text content for password reset email."""
+        return f"""
+        Password Reset Request
+        
+        Hello {user_name},
+        
+        We received a request to reset your password for your AliFrzngn Development account.
+        
+        Please visit the following link to reset your password:
+        
+        {reset_url}
+        
+        This link will expire in 1 hour for security reasons.
+        
+        If you didn't request a password reset, please ignore this email and your password will remain unchanged.
+        
+        Best regards,
+        AliFrzngn Development Team
+        """
+    
+    @staticmethod
+    def get_welcome_email_html(user_name: str) -> str:
+        """Get HTML content for welcome email."""
+        return f"""
+        <!DOCTYPE html>
+        <html>
+        <head>
+            <meta charset="utf-8">
+            <title>Welcome to AliFrzngn Development!</title>
+        </head>
+        <body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333;">
+            <div style="max-width: 600px; margin: 0 auto; padding: 20px;">
+                <h2 style="color: #27ae60;">Welcome to AliFrzngn Development!</h2>
+                <p>Hello {user_name},</p>
+                <p>Congratulations! Your email has been successfully verified and your account is now active.</p>
+                <p>You can now access all features of our platform:</p>
+                <ul>
+                    <li>Browse our product inventory</li>
+                    <li>Manage your customer profile</li>
+                    <li>Access exclusive features</li>
+                </ul>
+                <div style="text-align: center; margin: 30px 0;">
+                    <a href="{settings.frontend_url}" style="background-color: #27ae60; color: white; padding: 12px 24px; text-decoration: none; border-radius: 5px; display: inline-block;">Get Started</a>
+                </div>
+                <p>If you have any questions, feel free to contact our support team.</p>
+                <hr style="margin: 30px 0; border: none; border-top: 1px solid #eee;">
+                <p style="font-size: 12px; color: #666;">© 2025 AliFrzngn Development. All rights reserved.</p>
+            </div>
+        </body>
+        </html>
+        """
+    
+    @staticmethod
+    def get_welcome_email_text(user_name: str) -> str:
+        """Get text content for welcome email."""
+        return f"""
+        Welcome to AliFrzngn Development!
+        
+        Hello {user_name},
+        
+        Congratulations! Your email has been successfully verified and your account is now active.
+        
+        You can now access all features of our platform:
+        - Browse our product inventory
+        - Manage your customer profile
+        - Access exclusive features
+        
+        Visit our platform: {settings.frontend_url}
+        
+        If you have any questions, feel free to contact our support team.
+        
+        Best regards,
+        AliFrzngn Development Team
+        """
+
+
 class EmailService:
     """Email service for sending various types of emails."""
     
