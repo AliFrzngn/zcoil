@@ -3,28 +3,6 @@
 
 .PHONY: help setup build up down logs test clean restart status
 
-<<<<<<< Current (Your changes)
-# Security
-security-scan: ## Run security scans
-	safety check
-	cd frontend && npm audit
-
-# Documentation
-docs: ## Generate documentation
-	cd docs && make html
-
-# Performance
-perf-test: ## Run performance tests
-	cd scripts/performance && python load_test.py
-
-# Backup
-backup: ## Backup database
-	./scripts/maintenance/backup-database.sh
-
-# Health check
-health: ## Check service health
-	./scripts/maintenance/health-check.sh
-=======
 # Default target
 help:
 	@echo "AliFrzngn Development - Available Commands:"
@@ -170,4 +148,3 @@ stop-service:
 restart-service:
 	@echo "🔄 Restarting $(SERVICE)..."
 	@docker-compose restart $(SERVICE)
->>>>>>> Incoming (Background Agent changes)

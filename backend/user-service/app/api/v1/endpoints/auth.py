@@ -4,7 +4,7 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 
 from backend.shared.database import get_db
-from ...schemas.user import UserLogin, UserRegister, Token, UserResponse
+from ...schemas.user import UserLogin, UserRegister, Token, UserResponse, PasswordResetRequest, PasswordReset
 from ...services.auth_service import AuthService
 from ...services.user_service import UserService
 
@@ -80,3 +80,63 @@ async def refresh_token(
         token_type="bearer",
         expires_in=30 * 60  # 30 minutes
     )
+
+
+@router.post("/send-verification-email")
+async def send_verification_email(
+    user_id: int,
+    db: Session = Depends(get_db)
+):
+    """Send email verification email to user."""
+    user_service = UserService(db)
+    success = user_service.send_verification_email(user_id)
+    
+    if success:
+        return {"message": "Verification email sent successfully"}
+    else:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Failed to send verification email"
+        )
+
+
+@router.post("/verify-email")
+async def verify_email(
+    verification_token: str,
+    db: Session = Depends(get_db)
+):
+    """Verify email with verification token."""
+    user_service = UserService(db)
+    user = user_service.verify_email_with_token(verification_token)
+    
+    return {
+        "message": "Email verified successfully",
+        "user": user
+    }
+
+
+@router.post("/request-password-reset")
+async def request_password_reset(
+    request: PasswordResetRequest,
+    db: Session = Depends(get_db)
+):
+    """Request password reset."""
+    user_service = UserService(db)
+    success = user_service.request_password_reset(request.email)
+    
+    return {"message": "If the email exists, a password reset link has been sent"}
+
+
+@router.post("/reset-password")
+async def reset_password(
+    request: PasswordReset,
+    db: Session = Depends(get_db)
+):
+    """Reset password with reset token."""
+    user_service = UserService(db)
+    user = user_service.reset_password_with_token(request.token, request.new_password)
+    
+    return {
+        "message": "Password reset successfully",
+        "user": user
+    }

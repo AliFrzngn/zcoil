@@ -47,6 +47,9 @@ services:
       - SERVICE_NAME=user-service
       - ENVIRONMENT=development
       - DEBUG=true
+      - FRONTEND_URL=http://localhost:3000
+      - UPLOAD_DIR=/app/uploads
+      - MAX_FILE_SIZE=10485760
     ports:
       - "8003:8003"
     depends_on:
@@ -56,6 +59,7 @@ services:
         condition: service_healthy
     volumes:
       - ./backend:/app/backend
+      - user_uploads:/app/uploads
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8003/health"]
       interval: 30s
@@ -182,12 +186,8 @@ services:
 volumes:
   postgres_data:
   redis_data:
+  user_uploads:
 
 networks:
-<<<<<<< Current (Your changes)
-  microservices-network:
-    driver: bridge
-=======
   default:
     name: alifrzngn-network
->>>>>>> Incoming (Background Agent changes)

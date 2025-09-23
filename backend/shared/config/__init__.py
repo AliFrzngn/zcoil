@@ -55,6 +55,41 @@ class Settings(BaseSettings):
         env="CRM_SERVICE_URL"
     )
     
+<<<<<<< Current (Your changes)
+=======
+    # Email settings
+    smtp_server: str = Field(
+        default="smtp.gmail.com",
+        env="SMTP_SERVER"
+    )
+    smtp_port: int = Field(
+        default=587,
+        env="SMTP_PORT"
+    )
+    smtp_username: str = Field(
+        default="",
+        env="SMTP_USERNAME"
+    )
+    smtp_password: str = Field(
+        default="",
+        env="SMTP_PASSWORD"
+    )
+    from_email: str = Field(
+        default="noreply@alifrzngn.dev",
+        env="FROM_EMAIL"
+    )
+    from_name: str = Field(
+        default="AliFrzngn Development",
+        env="FROM_NAME"
+    )
+    
+    # Frontend URL for email links
+    frontend_url: str = Field(
+        default="http://localhost:3000",
+        env="FRONTEND_URL"
+    )
+    
+>>>>>>> Incoming (Background Agent changes)
     class Config:
         env_file = ".env"
         case_sensitive = False

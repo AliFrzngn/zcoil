@@ -5,9 +5,13 @@ from sqlalchemy.orm import Session
 from sqlalchemy import and_, or_, func
 from fastapi import HTTPException, status
 from passlib.context import CryptContext
+from datetime import datetime, timedelta
+import secrets
 
 from ..models.user import User
 from ..schemas.user import UserCreate, UserUpdate, UserFilter
+from backend.shared.email import EmailService
+from backend.shared.audit import AuditService
 
 # Password hashing context
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
@@ -18,6 +22,8 @@ class UserService:
     
     def __init__(self, db: Session):
         self.db = db
+        self.email_service = EmailService()
+        self.audit_service = AuditService(db)
     
     def verify_password(self, plain_password: str, hashed_password: str) -> bool:
         """Verify a password against its hash."""
@@ -167,8 +173,151 @@ class UserService:
         """Mark user's email as verified."""
         user = self.get_user(user_id)
         user.is_verified = True
-        from datetime import datetime
         user.email_verified_at = datetime.utcnow()
         self.db.commit()
         self.db.refresh(user)
+        
+        # Log audit event
+        self.audit_service.log_email_verification(
+            user_id=str(user_id),
+            email=user.email
+        )
+        
+        return user
+    
+    def send_verification_email(self, user_id: int) -> bool:
+        """Send email verification email to user."""
+        user = self.get_user(user_id)
+        
+        if user.is_verified:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Email is already verified"
+            )
+        
+        # Generate verification token
+        verification_token = secrets.token_urlsafe(32)
+        
+        # Store token in user metadata (in a real app, you'd use a separate table)
+        # For now, we'll use a simple approach
+        user.bio = f"verification_token:{verification_token}"
+        self.db.commit()
+        
+        # Send verification email
+        success = self.email_service.send_verification_email(
+            to_email=user.email,
+            verification_token=verification_token,
+            user_name=user.full_name or user.username
+        )
+        
+        return success
+    
+    def verify_email_with_token(self, verification_token: str) -> User:
+        """Verify email using verification token."""
+        # Find user with this verification token
+        user = self.db.query(User).filter(
+            User.bio.like(f"verification_token:{verification_token}")
+        ).first()
+        
+        if not user:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Invalid verification token"
+            )
+        
+        if user.is_verified:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Email is already verified"
+            )
+        
+        # Verify the email
+        user.is_verified = True
+        user.email_verified_at = datetime.utcnow()
+        user.bio = None  # Clear the token
+        self.db.commit()
+        self.db.refresh(user)
+        
+        # Log audit event
+        self.audit_service.log_email_verification(
+            user_id=str(user.id),
+            email=user.email
+        )
+        
+        # Send welcome email
+        self.email_service.send_welcome_email(
+            to_email=user.email,
+            user_name=user.full_name or user.username
+        )
+        
+        return user
+    
+    def request_password_reset(self, email: str) -> bool:
+        """Request password reset for user."""
+        user = self.get_user_by_email(email)
+        if not user:
+            # Don't reveal if email exists or not
+            return True
+        
+        # Generate reset token
+        reset_token = secrets.token_urlsafe(32)
+        
+        # Store token in user metadata (in a real app, you'd use a separate table)
+        user.bio = f"reset_token:{reset_token}:{datetime.utcnow().isoformat()}"
+        self.db.commit()
+        
+        # Send password reset email
+        success = self.email_service.send_password_reset_email(
+            to_email=user.email,
+            reset_token=reset_token,
+            user_name=user.full_name or user.username
+        )
+        
+        # Log audit event
+        self.audit_service.log_password_reset_request(
+            user_id=str(user.id),
+            email=user.email
+        )
+        
+        return success
+    
+    def reset_password_with_token(self, reset_token: str, new_password: str) -> User:
+        """Reset password using reset token."""
+        # Find user with this reset token
+        user = self.db.query(User).filter(
+            User.bio.like(f"reset_token:{reset_token}:%")
+        ).first()
+        
+        if not user:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Invalid reset token"
+            )
+        
+        # Check if token is expired (1 hour)
+        try:
+            token_data = user.bio.split(":")
+            token_time = datetime.fromisoformat(token_data[2])
+            if datetime.utcnow() - token_time > timedelta(hours=1):
+                raise HTTPException(
+                    status_code=status.HTTP_400_BAD_REQUEST,
+                    detail="Reset token has expired"
+                )
+        except (IndexError, ValueError):
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Invalid reset token format"
+            )
+        
+        # Update password
+        user.hashed_password = self.get_password_hash(new_password)
+        user.bio = None  # Clear the token
+        self.db.commit()
+        self.db.refresh(user)
+        
+        # Log audit event
+        self.audit_service.log_password_reset_complete(
+            user_id=str(user.id)
+        )
+        
         return user
