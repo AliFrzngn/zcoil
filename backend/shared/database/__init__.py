@@ -77,6 +77,9 @@ def drop_tables():
     """Drop all tables."""
     Base.metadata.drop_all(bind=engine)
 <<<<<<< Current (Your changes)
+<<<<<<< Current (Your changes)
+>>>>>>> Incoming (Background Agent changes)
+=======
 >>>>>>> Incoming (Background Agent changes)
 =======
 >>>>>>> Incoming (Background Agent changes)
