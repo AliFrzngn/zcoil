@@ -300,3 +300,4 @@ grafana_data/
 # Local environment files
 .env.local
 .env.*.local
+static-analysis.datadog.yml
