@@ -10,7 +10,7 @@ import { authApi } from '@/lib/api';
 import { toast } from 'react-hot-toast';
 
 const loginSchema = z.object({
-  email: z.string().email('Invalid email address'),
+  username: z.string().min(3, 'Username must be at least 3 characters'),
   password: z.string().min(6, 'Password must be at least 6 characters'),
 });
 
@@ -31,7 +31,7 @@ export default function LoginPage() {
   const onSubmit = async (data: LoginForm) => {
     setIsLoading(true);
     try {
-      const response = await authApi.login(data.email, data.password);
+      const response = await authApi.login(data.username, data.password);
       const { access_token, user } = response.data;
       
       // Store token and user data
@@ -55,30 +55,24 @@ export default function LoginPage() {
             Sign in to your account
           </h2>
           <p className="mt-2 text-center text-sm text-gray-600">
-            Or{' '}
-            <Link
-              href="/register"
-              className="font-medium text-primary-600 hover:text-primary-500"
-            >
-              create a new account
-            </Link>
+            Enter your credentials to access the CRM system
           </p>
         </div>
         <form className="mt-8 space-y-6" onSubmit={handleSubmit(onSubmit)}>
           <div className="space-y-4">
             <div>
-              <label htmlFor="email" className="block text-sm font-medium text-gray-700">
-                Email address
+              <label htmlFor="username" className="block text-sm font-medium text-gray-700">
+                Username
               </label>
               <input
-                {...register('email')}
-                type="email"
-                autoComplete="email"
+                {...register('username')}
+                type="text"
+                autoComplete="username"
                 className="input mt-1"
-                placeholder="Enter your email"
+                placeholder="Enter your username"
               />
-              {errors.email && (
-                <p className="mt-1 text-sm text-red-600">{errors.email.message}</p>
+              {errors.username && (
+                <p className="mt-1 text-sm text-red-600">{errors.username.message}</p>
               )}
             </div>
             <div>
