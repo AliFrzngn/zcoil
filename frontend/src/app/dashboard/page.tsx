@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { getClientSession } from '@/lib/auth';
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
-import { DashboardOverview } from '@/components/dashboard/DashboardOverview';
+import { RecordsDashboard } from '@/components/dashboard/RecordsDashboard';
 
 export default function DashboardPage() {
   const router = useRouter();
@@ -35,7 +35,7 @@ export default function DashboardPage() {
 
   return (
     <DashboardLayout user={session.user}>
-      <DashboardOverview />
+      <RecordsDashboard />
     </DashboardLayout>
   );
 }

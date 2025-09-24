@@ -22,10 +22,6 @@ interface DashboardLayoutProps {
 
 const navigation = [
   { name: 'Dashboard', href: '/dashboard', icon: HomeIcon },
-  { name: 'Inventory', href: '/inventory', icon: CubeIcon },
-  { name: 'CRM', href: '/crm', icon: UsersIcon },
-  { name: 'Notifications', href: '/notifications', icon: BellIcon },
-  { name: 'Settings', href: '/settings', icon: Cog6ToothIcon },
 ];
 
 export function DashboardLayout({ children, user }: DashboardLayoutProps) {
